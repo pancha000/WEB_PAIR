@@ -1,12 +1,12 @@
 {
-"name": "Slpancha-web-pair",
+"name": "Pancha-web-pair",
     "version": "0.0.1",
     "description": "A multi functional whatsapp bot Web paircode.",
     "main": "index.js",
     "scripts": {
-      "start": "pm2 start index.js --deep-monitoring --attach --name Slpancha",
-      "stop": "pm2 stop slpancha",
-     "restart": "pm2 restart slpancha"
+      "start": "pm2 start index.js --deep-monitoring --attach --name Pancha",
+      "stop": "pm2 stop Pancha",
+     "restart": "pm2 restart Pancha"
     },
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.9",
