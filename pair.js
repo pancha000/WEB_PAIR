@@ -20,10 +20,10 @@ function removeFile(FilePath) {
 
 router.get("/", async (req, res) => {
   let num = req.query.number;
-  async function SlpanchaPair() {
+  async function PanchaPair() {
     const { state, saveCreds } = await useMultiFileAuthState(`./session`);
     try {
-      let SlpanchaPairWeb = makeWASocket({
+      let PanchaPairWeb = makeWASocket({
         auth: {
           creds: state.creds,
           keys: makeCacheableSignalKeyStore(
@@ -36,17 +36,17 @@ router.get("/", async (req, res) => {
         browser: Browsers.macOS("Safari"),
       });
 
-      if (!SlpanchaPairWeb.authState.creds.registered) {
+      if (!PanchaPairWeb.authState.creds.registered) {
         await delay(1500);
         num = num.replace(/[^0-9]/g, "");
-        const code = await SlpanchaPairWeb.requestPairingCode(num);
+        const code = await PanchaPairWeb.requestPairingCode(num);
         if (!res.headersSent) {
           await res.send({ code });
         }
       }
 
-      SlpanchaPairWeb.ev.on("creds.update", saveCreds);
-      SlpanchaPairWeb.ev.on("connection.update", async (s) => {
+      PanchaPairWeb.ev.on("creds.update", saveCreds);
+      PanchaPairWeb.ev.on("connection.update", async (s) => {
         const { connection, lastDisconnect } = s;
         if (connection === "open") {
           try {
@@ -54,7 +54,7 @@ router.get("/", async (req, res) => {
             const sessionPrabath = fs.readFileSync("./session/creds.json");
 
             const auth_path = "./session/";
-            const user_jid = jidNormalizedUser(SlpanchaPairWeb.user.id);
+            const user_jid = jidNormalizedUser(PanchaPairWeb.user.id);
 
             function randomMegaId(length = 6, numberLength = 4) {
               const characters =
@@ -81,18 +81,18 @@ router.get("/", async (req, res) => {
               ""
             );
 
-            const sid = `*SLPANCHA [The powerful WA BOT]*\n\n👉 ${string_session} 👈\n\n*This is the your Session ID, copy this id and paste into config.js file*\n\n*You can ask any question using this link*\n\n*wa.me/message/WKGLBR2PCETWD1*\n\n*You can join my whatsapp group*\n\n*https://chat.whatsapp.com/GAOhr0qNK7KEvJwbenGivZ*`;
+            const sid = `*PANCHA [The powerful WA BOT]*\n\n👉 ${string_session} 👈\n\n*This is the your Session ID, copy this id and paste into config.js file*\n\n*You can ask any question using this link*\n\n*wa.me/message/WKGLBR2PCETWD1*\n\n*You can join my whatsapp group*\n\n*https://chat.whatsapp.com/GAOhr0qNK7KEvJwbenGivZ*`;
             const mg = `🛑 *Do not share this code to anyone* 🛑`;
-            const dt = await SlpanchaPairWeb.sendMessage(user_jid, {
+            const dt = await PanchaPairWeb.sendMessage(user_jid, {
               image: {
                 url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsjuYdk3u_6CaCXjx-KCMYpPofmlJd8DPY6Q&usqp=CAU",
               },
               caption: sid,
             });
-            const msg = await SlpanchaPairWeb.sendMessage(user_jid, {
+            const msg = await PanchaPairWeb.sendMessage(user_jid, {
               text: string_session,
             });
-            const msg1 = await SlpanchaPairWeb.sendMessage(user_jid, { text: mg });
+            const msg1 = await PanchaPairWeb.sendMessage(user_jid, { text: mg });
           } catch (e) {
             exec("pm2 restart prabath");
           }
@@ -107,7 +107,7 @@ router.get("/", async (req, res) => {
           lastDisconnect.error.output.statusCode !== 401
         ) {
           await delay(10000);
-          SlpanchaPair();
+          PanchaPair();
         }
       });
     } catch (err) {
@@ -120,7 +120,7 @@ router.get("/", async (req, res) => {
       }
     }
   }
-  return await SlpanchaPair();
+  return await PanchaPair();
 });
 
 process.on("uncaughtException", function (err) {
