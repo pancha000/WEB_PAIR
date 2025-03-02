@@ -1,22 +1,21 @@
 {
-"name": "Pancha-web-pair",
-    "version": "0.0.1",
-    "description": "A multi functional whatsapp bot Web paircode.",
-    "main": "index.js",
-    "scripts": {
-      "start": "pm2 start index.js --deep-monitoring --attach --name Pancha",
-      "stop": "pm2 stop Pancha",
-     "restart": "pm2 restart Pancha"
-    },
+  "name": "Pancha-web-pair",
+  "version": "0.0.1",
+  "description": "A multi functional whatsapp bot Web paircode.",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2 start index.js --deep-monitoring --attach --name Pancha",
+    "stop": "pm2 stop Pancha",
+    "restart": "pm2 restart Pancha"
+  },
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.13",
     "qrcode": "^1.5.4",
     "awesome-phonenumber": "^7.3.0",
     "pino": "^9.6.0",
-    "phone" : "^3.1.58",
+    "phone": "^3.1.58",
     "body-parser": "^1.20.3",
     "express": "^4.21.2",
-    "path": "^0.12.7",
     "megajs": "^1.3.5",
     "pm2": "^5.4.3",
     "@pm2/io": "^6.1.0",
@@ -24,5 +23,5 @@
     "@eslint/config-array": "^0.19.2",
     "@eslint/object-schema": "^2.1.6",
     "eslint": "^9.21.0"
-   }
+  }
 }
