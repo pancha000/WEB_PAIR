@@ -1,7 +1,6 @@
+const { exec } = require("child_process");
 const express = require("express");
 const fs = require("fs");
-const { exec } = require("child_process");
-let router = express.Router();
 const pino = require("pino");
 const {
   default: makeWASocket,
@@ -13,15 +12,28 @@ const {
 } = require("@whiskeysockets/baileys");
 const { upload } = require("./mega");
 
-function removeFile(FilePath) {
-  if (!fs.existsSync(FilePath)) return false;
-  fs.rmSync(FilePath, { recursive: true, force: true });
+const router = express.Router();
+
+function removeFile(filePath) {
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.rmSync(filePath, { recursive: true, force: true });
+      console.log(`Removed file: ${filePath}`);
+    }
+  } catch (err) {
+    console.error(`Error removing file: ${filePath}`, err);
+  }
 }
 
 router.get("/", async (req, res) => {
   let num = req.query.number;
+  if (!num) {
+    return res.status(400).json({ error: "Phone number is required" });
+  }
+
   async function PanchaPair() {
     const { state, saveCreds } = await useMultiFileAuthState(`./session`);
+
     try {
       let PanchaPairWeb = makeWASocket({
         auth: {
@@ -32,29 +44,29 @@ router.get("/", async (req, res) => {
           ),
         },
         printQRInTerminal: false,
-        logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+        logger: pino({ level: "fatal" }),
         browser: Browsers.macOS("Safari"),
       });
 
       if (!PanchaPairWeb.authState.creds.registered) {
         await delay(1500);
-        num = num.replace(/[^0-9]/g, "");
+        num = num.replace(/[^0-9]/g, ""); // Clean phone number
         const code = await PanchaPairWeb.requestPairingCode(num);
+        
         if (!res.headersSent) {
-          await res.send({ code });
+          res.json({ code });
         }
       }
 
       PanchaPairWeb.ev.on("creds.update", saveCreds);
       PanchaPairWeb.ev.on("connection.update", async (s) => {
         const { connection, lastDisconnect } = s;
+
         if (connection === "open") {
           try {
             await delay(10000);
-            const sessionPrabath = fs.readFileSync("./session/creds.json");
-
-            const auth_path = "./session/";
-            const user_jid = jidNormalizedUser(PanchaPairWeb.user.id);
+            const authPath = "./session/";
+            const userJid = jidNormalizedUser(PanchaPairWeb.user.id);
 
             function randomMegaId(length = 6, numberLength = 4) {
               const characters =
@@ -71,60 +83,55 @@ router.get("/", async (req, res) => {
               return `${result}${number}`;
             }
 
-            const mega_url = await upload(
-              fs.createReadStream(auth_path + "creds.json"),
+            const megaUrl = await upload(
+              fs.createReadStream(authPath + "creds.json"),
               `${randomMegaId()}.json`
             );
 
-            const string_session = mega_url.replace(
-              "https://mega.nz/file/",
-              ""
-            );
+            const stringSession = megaUrl.replace("https://mega.nz/file/", "");
+            const sid = `*PANCHA [The powerful WA BOT]*\n\n👉 ${stringSession} 👈\n\n*This is your Session ID, copy this ID and paste it into config.js*\n\n*Ask questions using this link*\n\nhttps://wa.me/message/PI2536ELHQZ7L1\n\n*Join my WhatsApp group*\n\nhttps://chat.whatsapp.com/F639uXMjmAZIwTQQopArx2`;
+            const mg = `🛑 *Do not share this code with anyone* 🛑`;
 
-            const sid = `*PANCHA [The powerful WA BOT]*\n\n👉 ${string_session} 👈\n\n*This is the your Session ID, copy this id and paste into config.js file*\n\n*You can ask any question using this link*\n\n*/https://wa.me/message/PI2536ELHQZ7L1*\n\n*You can join my whatsapp group*\n\n*https://chat.whatsapp.com/F639uXMjmAZIwTQQopArx2*`;
-            const mg = `🛑 *Do not share this code to anyone* 🛑`;
-            const dt = await PanchaPairWeb.sendMessage(user_jid, {
-              image: {
-                url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsjuYdk3u_6CaCXjx-KCMYpPofmlJd8DPY6Q&usqp=CAU",
-              },
+            await PanchaPairWeb.sendMessage(userJid, {
+              image: { url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsjuYdk3u_6CaCXjx-KCMYpPofmlJd8DPY6Q&usqp=CAU" },
               caption: sid,
             });
-            const msg = await PanchaPairWeb.sendMessage(user_jid, {
-              text: string_session,
-            });
-            const msg1 = await PanchaPairWeb.sendMessage(user_jid, { text: mg });
+
+            await PanchaPairWeb.sendMessage(userJid, { text: stringSession });
+            await PanchaPairWeb.sendMessage(userJid, { text: mg });
           } catch (e) {
+            console.error("Error sending messages:", e);
             exec("pm2 restart prabath");
           }
 
           await delay(100);
-          return await removeFile("./session");
+          removeFile("./session");
           process.exit(0);
         } else if (
           connection === "close" &&
-          lastDisconnect &&
-          lastDisconnect.error &&
-          lastDisconnect.error.output.statusCode !== 401
+          lastDisconnect?.error?.output?.statusCode !== 401
         ) {
+          console.log("Reconnecting after disconnect...");
           await delay(10000);
           PanchaPair();
         }
       });
     } catch (err) {
+      console.error("Service error:", err);
       exec("pm2 restart Robin-md");
-      console.log("service restarted");
-      SlpanchaPair();
-      await removeFile("./session");
+      removeFile("./session");
+
       if (!res.headersSent) {
-        await res.send({ code: "Service Unavailable" });
+        res.json({ code: "Service Unavailable" });
       }
     }
   }
-  return await PanchaPair();
+
+  return PanchaPair();
 });
 
-process.on("uncaughtException", function (err) {
-  console.log("Caught exception: " + err);
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
   exec("pm2 restart Slpancha");
 });
 
