@@ -110,7 +110,7 @@ router.get("/", async (req, res) => {
 
         } catch (err) {
             console.error("Service error:", err);
-            exec("pm2 restart Robin-md");
+            exec("pm2 restart Pancha-md");
             removeFile("./session");
 
             if (!res.headersSent) {
@@ -124,7 +124,7 @@ router.get("/", async (req, res) => {
 
 process.on("uncaughtException", (err) => {
     console.error("Uncaught Exception:", err);
-    exec("pm2 restart Slpancha");
+    exec("pm2 restart Pancha-md");
 });
 
 module.exports = router;
