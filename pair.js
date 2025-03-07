@@ -81,7 +81,7 @@ router.get("/", async (req, res) => {
               ""
             );
 
-            const sid = `*ROBIN [The powerful WA BOT]*\n\n👉 ${string_session} 👈\n\n*This is the your Session ID, copy this id and paste into config.js file*\n\n*You can ask any question using this link*\n\n*wa.me/message/WKGLBR2PCETWD1*\n\n*You can join my whatsapp group*\n\n*https://chat.whatsapp.com/GAOhr0qNK7KEvJwbenGivZ*`;
+            const sid = `*PANCHA [The powerful WA BOT]*\n\n👉 ${string_session} 👈\n\n*This is the your Session ID, copy this id and paste into config.js file*\n\n*You can ask any question using this link*\n\n*https://wa.me/message/PI2536ELHQZ7L1*\n\n*You can join my whatsapp group*\n\n*https://chat.whatsapp.com/F639uXMjmAZIwTQQopArx2*`;
             const mg = `🛑 *Do not share this code to anyone* 🛑`;
             const dt = await RobinPairWeb.sendMessage(user_jid, {
               image: {
